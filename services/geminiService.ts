@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import type { AnalysisResult } from '../types';
 
@@ -28,7 +28,7 @@ export const analyzeImage = async (imageFiles: File[]): Promise<AnalysisResult> 
         const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
 
         const response = await ai.models.generateContent({
-            model: 'gemini-flash-lite-latest',
+            model: 'gemini-2.5-pro',
             contents: [{
                 parts: [
                     { text: SYSTEM_PROMPT },
@@ -102,19 +102,25 @@ export const analyzeImage = async (imageFiles: File[]): Promise<AnalysisResult> 
 export const generateProjectImage = async (prompt: string): Promise<string> => {
     try {
         const ai = getAiClient();
-        const response = await ai.models.generateImages({
-            model: 'imagen-4.0-generate-001',
-            prompt: prompt,
-            config: {
-              numberOfImages: 1,
-              outputMimeType: 'image/png',
-              aspectRatio: '1:1',
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: {
+              parts: [
+                {
+                  text: prompt,
+                },
+              ],
             },
-        });
+            config: {
+                responseModalities: [Modality.IMAGE],
+            },
+          });
 
-        if (response.generatedImages && response.generatedImages.length > 0) {
-            const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
-            return `data:image/png;base64,${base64ImageBytes}`;
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+              const base64ImageBytes: string = part.inlineData.data;
+              return `data:image/png;base64,${base64ImageBytes}`;
+            }
         }
         
         throw new Error("No image data found in the API response.");

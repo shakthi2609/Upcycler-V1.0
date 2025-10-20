@@ -29,7 +29,7 @@ const ProjectChat: React.FC<ProjectChatProps> = ({ project }) => {
                 if (!apiKey) throw new Error("API Key not found");
                 const ai = new GoogleGenAI({ apiKey });
                 chatRef.current = ai.chats.create({
-                    model: 'gemini-flash-lite-latest',
+                    model: 'gemini-2.5-pro',
                     config: { systemInstruction },
                 });
                 setMessages([{ role: 'model', text: `I see you're looking at the "${project.project_name}" project. What questions do you have?` }]);
