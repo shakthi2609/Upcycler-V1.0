@@ -10,6 +10,7 @@ export interface ProjectIdea {
   youtube_search_query: string;
   imageUrl?: string;
   isGeneratingImage?: boolean;
+  imageError?: string;
 }
 
 export interface AnalysisResult {

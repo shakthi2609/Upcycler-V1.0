@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { ProjectIdea } from '../types';
 import { SaveIcon, CheckCircleIcon } from './icons';
@@ -23,7 +22,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect, onSave, is
       {project.imageUrl ? (
         <img src={project.imageUrl} alt={project.project_name} className="w-full h-48 object-cover" />
       ) : (
-        <ImagePlaceholder isLoading={project.isGeneratingImage} />
+        <ImagePlaceholder isLoading={project.isGeneratingImage} error={project.imageError} />
       )}
       <div className="p-6 flex-grow cursor-pointer" onClick={() => onSelect(project)}>
         <h3 className="text-xl font-bold text-gray-800 mb-2">{project.project_name}</h3>

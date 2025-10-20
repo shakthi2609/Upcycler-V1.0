@@ -65,13 +65,14 @@ const App: React.FC = () => {
                     });
                 } catch (imgErr) {
                     console.error(`Failed to generate image for "${project.project_name}":`, imgErr);
-                    // Update state to show that loading has finished, even on error
+                    const errorMessage = imgErr instanceof Error ? imgErr.message : "Failed to generate.";
+                    // Update state to show that loading has finished and capture the error
                     setAnalysisResult(prev => {
                         if (!prev) return null;
                         return {
                             ...prev,
                             project_ideas: prev.project_ideas.map(p => 
-                                p.id === project.id ? { ...p, isGeneratingImage: false } : p
+                                p.id === project.id ? { ...p, isGeneratingImage: false, imageError: errorMessage } : p
                             ),
                         };
                     });
