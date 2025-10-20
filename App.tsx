@@ -43,43 +43,15 @@ const App: React.FC = () => {
         try {
             const result = await analyzeImage(imageFiles);
             
+            // Assign IDs but do not trigger image generation automatically
             const projectsWithIds = result.project_ideas.map(p => ({
                 ...p,
                 id: window.uuid.v4(),
-                isGeneratingImage: true,
+                isGeneratingImage: false, // Default to false
+                imageUrl: undefined,
             }));
             
             setAnalysisResult({ ...result, project_ideas: projectsWithIds });
-
-            // Asynchronously generate images for each project idea
-            projectsWithIds.forEach(async (project) => {
-                try {
-                    const imageUrl = await generateProjectImage(project.ai_image_prompt);
-                    // Update state immutably for the specific project that has its image ready
-                    setAnalysisResult(prev => {
-                        if (!prev) return null;
-                        return {
-                            ...prev,
-                            project_ideas: prev.project_ideas.map(p => 
-                                p.id === project.id ? { ...p, imageUrl, isGeneratingImage: false } : p
-                            ),
-                        };
-                    });
-                } catch (imgErr) {
-                    console.error(`Failed to generate image for "${project.project_name}":`, imgErr);
-                    const errorMessage = imgErr instanceof Error ? imgErr.message : "Failed to generate.";
-                    // Update state to show that loading has finished and capture the error
-                    setAnalysisResult(prev => {
-                        if (!prev) return null;
-                        return {
-                            ...prev,
-                            project_ideas: prev.project_ideas.map(p => 
-                                p.id === project.id ? { ...p, isGeneratingImage: false, imageError: errorMessage } : p
-                            ),
-                        };
-                    });
-                }
-            });
 
         } catch (err) {
             if (err instanceof Error) {
@@ -91,10 +63,52 @@ const App: React.FC = () => {
             setIsLoading(false);
         }
     }, [imageFiles]);
+
+    const handleGenerateSingleImage = useCallback(async (projectId: string) => {
+        // Set loading state for the specific project
+        setAnalysisResult(prev => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                project_ideas: prev.project_ideas.map(p =>
+                    p.id === projectId ? { ...p, isGeneratingImage: true, imageError: undefined } : p
+                ),
+            };
+        });
+
+        const project = analysisResult?.project_ideas.find(p => p.id === projectId);
+        if (!project) return;
+
+        try {
+            const imageUrl = await generateProjectImage(project.ai_image_prompt);
+            setAnalysisResult(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    project_ideas: prev.project_ideas.map(p =>
+                        p.id === projectId ? { ...p, imageUrl, isGeneratingImage: false } : p
+                    ),
+                };
+            });
+        } catch (imgErr) {
+            console.error(`Failed to generate image for "${project.project_name}":`, imgErr);
+            const errorMessage = imgErr instanceof Error ? imgErr.message : "Failed to generate.";
+            setAnalysisResult(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    project_ideas: prev.project_ideas.map(p =>
+                        p.id === projectId ? { ...p, isGeneratingImage: false, imageError: errorMessage } : p
+                    ),
+                };
+            });
+        }
+    }, [analysisResult]);
     
     const handleSaveProject = (projectToSave: ProjectIdea) => {
         const isAlreadySaved = savedProjects.some(p => p.project_name === projectToSave.project_name);
         if (!isAlreadySaved) {
+            // Ensure the project being saved has a consistent ID and includes the image URL if it exists
             const newProject = { ...projectToSave, id: projectToSave.id || window.uuid.v4() };
             setSavedProjects(prev => [...prev, newProject]);
         }
@@ -131,6 +145,7 @@ const App: React.FC = () => {
                                 onSelect={setSelectedProject}
                                 onSave={handleSaveProject}
                                 isSaved={isProjectSaved(project.project_name)}
+                                onGenerateImage={handleGenerateSingleImage}
                             />
                         ))}
                     </div>

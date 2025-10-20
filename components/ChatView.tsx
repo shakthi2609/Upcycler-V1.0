@@ -19,7 +19,7 @@ const ChatView: React.FC = () => {
                 if (!apiKey) throw new Error("API Key not found");
                 const ai = new GoogleGenAI({ apiKey });
                 chatRef.current = ai.chats.create({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-flash-lite-latest',
                     config: {
                         systemInstruction: 'You are Upcycle AI, a friendly and creative assistant who helps people with upcycling, recycling, and DIY projects. Keep your answers concise and helpful. Use markdown for formatting when appropriate.',
                     },

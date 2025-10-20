@@ -8,13 +8,21 @@ interface ProjectCardProps {
   onSelect: (project: ProjectIdea) => void;
   onSave: (project: ProjectIdea) => void;
   isSaved: boolean;
+  onGenerateImage: (projectId: string) => void;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect, onSave, isSaved }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect, onSave, isSaved, onGenerateImage }) => {
   const difficultyColor = {
     beginner: 'bg-green-100 text-green-800',
     intermediate: 'bg-yellow-100 text-yellow-800',
     advanced: 'bg-red-100 text-red-800',
+  };
+
+  const handleGenerateClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the card's onSelect from firing
+    if (project.id) {
+        onGenerateImage(project.id);
+    }
   };
 
   return (
@@ -22,7 +30,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect, onSave, is
       {project.imageUrl ? (
         <img src={project.imageUrl} alt={project.project_name} className="w-full h-48 object-cover" />
       ) : (
-        <ImagePlaceholder isLoading={project.isGeneratingImage} error={project.imageError} />
+        <ImagePlaceholder 
+          isLoading={project.isGeneratingImage} 
+          error={project.imageError}
+          onGenerateClick={handleGenerateClick}
+        />
       )}
       <div className="p-6 flex-grow cursor-pointer" onClick={() => onSelect(project)}>
         <h3 className="text-xl font-bold text-gray-800 mb-2">{project.project_name}</h3>
