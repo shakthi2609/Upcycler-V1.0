@@ -15,6 +15,7 @@ import ChatView from './components/ChatView';
 
 const App: React.FC = () => {
     const [apiKey, setApiKey] = useState<string | null>(() => localStorage.getItem('gemini-api-key'));
+    const [isEditKeyModalOpen, setIsEditKeyModalOpen] = useState(false);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -26,6 +27,7 @@ const App: React.FC = () => {
     const handleSaveApiKey = (key: string) => {
         localStorage.setItem('gemini-api-key', key);
         setApiKey(key);
+        setIsEditKeyModalOpen(false); // Close the modal if it was open for editing
     };
 
     const handleAnalyzeClick = useCallback(async () => {
@@ -169,12 +171,22 @@ const App: React.FC = () => {
 
     return (
         <div className="bg-gray-50 min-h-screen font-sans">
+            {/* Initial API Key Modal */}
             {!apiKey && <ApiKeyModal onSave={handleSaveApiKey} />}
+            
+            {/* Edit API Key Modal */}
+            {isEditKeyModalOpen && (
+                <ApiKeyModal 
+                    onSave={handleSaveApiKey} 
+                    onClose={() => setIsEditKeyModalOpen(false)}
+                />
+            )}
             
             <Header
                 currentView={currentView}
                 setCurrentView={setCurrentView}
                 savedProjectsCount={savedProjects.length}
+                onEditApiKey={apiKey ? () => setIsEditKeyModalOpen(true) : undefined}
             />
 
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

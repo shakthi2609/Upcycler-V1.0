@@ -1,12 +1,14 @@
 import React from 'react';
+import { PencilIcon } from './icons';
 
 interface HeaderProps {
     currentView: 'home' | 'saved' | 'chat';
     setCurrentView: (view: 'home' | 'saved' | 'chat') => void;
     savedProjectsCount: number;
+    onEditApiKey?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, savedProjectsCount }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, savedProjectsCount, onEditApiKey }) => {
   
     const baseClasses = "px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500";
     const activeClasses = "bg-green-600 text-white";
@@ -21,22 +23,33 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, savedProje
                     </svg>
                     <h1 className="text-2xl font-bold text-gray-800">Upcycle AI</h1>
                 </div>
-                <nav className="bg-gray-200 p-1 rounded-lg flex space-x-1">
-                    <button onClick={() => setCurrentView('home')} className={`${baseClasses} ${currentView === 'home' ? activeClasses : inactiveClasses}`}>
-                        Home
-                    </button>
-                    <button onClick={() => setCurrentView('chat')} className={`${baseClasses} ${currentView === 'chat' ? activeClasses : inactiveClasses}`}>
-                        Chat
-                    </button>
-                    <button onClick={() => setCurrentView('saved')} className={`${baseClasses} ${currentView === 'saved' ? activeClasses : inactiveClasses} relative`}>
-                        My Projects
-                        {savedProjectsCount > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                                {savedProjectsCount}
-                            </span>
-                        )}
-                    </button>
-                </nav>
+                <div className="flex items-center space-x-2">
+                    <nav className="bg-gray-200 p-1 rounded-lg flex space-x-1">
+                        <button onClick={() => setCurrentView('home')} className={`${baseClasses} ${currentView === 'home' ? activeClasses : inactiveClasses}`}>
+                            Home
+                        </button>
+                        <button onClick={() => setCurrentView('chat')} className={`${baseClasses} ${currentView === 'chat' ? activeClasses : inactiveClasses}`}>
+                            Chat
+                        </button>
+                        <button onClick={() => setCurrentView('saved')} className={`${baseClasses} ${currentView === 'saved' ? activeClasses : inactiveClasses} relative`}>
+                            My Projects
+                            {savedProjectsCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                    {savedProjectsCount}
+                                </span>
+                            )}
+                        </button>
+                    </nav>
+                    {onEditApiKey && (
+                        <button
+                            onClick={onEditApiKey}
+                            className="p-2 rounded-full text-gray-600 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            aria-label="Edit API Key"
+                        >
+                            <PencilIcon className="w-5 h-5" />
+                        </button>
+                    )}
+                </div>
             </div>
         </header>
     );
