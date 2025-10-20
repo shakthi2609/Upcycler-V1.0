@@ -18,8 +18,8 @@ const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({ isLoading = false, 
     return (
         <div className="relative w-full h-48 bg-red-100 flex flex-col items-center justify-center overflow-hidden text-red-700 p-4 text-center">
             <ExclamationCircleIcon className="w-10 h-10 mb-2" />
-            <span className="text-sm font-semibold">Image Failed</span>
-            <span className="text-xs mt-1">{error.includes('SAFETY') ? "Blocked by safety filter" : "Could not generate"}</span>
+            <span className="text-sm font-semibold">Image Generation Failed</span>
+            <span className="text-xs mt-1">{error}</span>
         </div>
     );
   }

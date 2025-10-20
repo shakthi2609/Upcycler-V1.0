@@ -123,13 +123,17 @@ export const generateProjectImage = async (prompt: string): Promise<string> => {
     } catch (error) {
         console.error("Image Generation Error:", error);
         if (error instanceof Error) {
-             if(error.message.includes('API key not valid')) {
+            const errorMessage = error.message.toLowerCase();
+             if(errorMessage.includes('api key not valid')) {
                 // Force user to re-enter key
                 localStorage.removeItem('gemini-api-key');
                 window.location.reload();
             }
-            if(error.message.includes('SAFETY')) {
-                throw new Error("The image could not be generated due to safety settings.");
+            if(errorMessage.includes('safety')) {
+                throw new Error("The image was blocked due to safety settings.");
+            }
+            if (errorMessage.includes('quota')) {
+                throw new Error("Quota exceeded. Please request a higher limit for your project in Google Cloud.");
             }
             throw new Error(`An error occurred while generating the image: ${error.message}`);
         }
