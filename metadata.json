@@ -1,0 +1,7 @@
+{
+  "name": "Upcycle AI",
+  "description": "An AI-powered assistant to help you find creative upcycling projects for your waste items. Snap a photo of your recyclables, and get step-by-step guides for unique DIY projects.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
