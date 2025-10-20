@@ -7,7 +7,8 @@ const getAiClient = (): GoogleGenAI => {
     if (!apiKey) {
         throw new Error("API key not found in local storage. Please set it.");
     }
-    return new GoogleGenAI({ apiKey });
+    // Remove the `replace` call that's causing the issue
+    return new GoogleGenAI({ apiKey: apiKey.trim() });
 };
 
 const fileToGenerativePart = async (file: File) => {
