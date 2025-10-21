@@ -1,3 +1,10 @@
+export interface JournalEntry {
+  id: string;
+  photoUrl?: string;
+  note: string;
+  date: string;
+}
+
 export interface ProjectIdea {
   id?: string; // Add optional ID for saved projects
   project_name: string;
@@ -12,6 +19,7 @@ export interface ProjectIdea {
   imageUrl?: string;
   isGeneratingImage?: boolean;
   imageError?: string;
+  journal?: JournalEntry[];
 }
 
 export interface AnalysisResult {

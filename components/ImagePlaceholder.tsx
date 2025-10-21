@@ -16,17 +16,24 @@ const ExclamationCircleIcon = ({ className }: { className?: string }) => (
 
 const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({ isLoading, error, onGenerateClick }) => {
   return (
-    <div className="w-full h-48 bg-gray-100 flex flex-col justify-center items-center text-center p-4">
+    <div className="w-full h-full bg-gray-100 flex flex-col justify-center items-center text-center p-4">
       {isLoading ? (
         <>
           <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-green-600 mb-2"></div>
           <span className="text-sm font-semibold text-gray-600">Generating Image...</span>
         </>
       ) : error ? (
-        <div className="text-red-500">
+        <div className="text-red-500 flex flex-col items-center justify-center h-full">
             <ExclamationCircleIcon className="w-8 h-8 mx-auto mb-2" />
-            <span className="text-xs font-semibold block">Image failed</span>
-            <span className="text-xs text-red-400 block max-w-full truncate">{error}</span>
+            <span className="text-sm font-semibold block">Couldn't generate image.</span>
+            {onGenerateClick && (
+                <button
+                    onClick={onGenerateClick}
+                    className="mt-2 px-4 py-1.5 bg-red-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 transition-colors"
+                >
+                    Retry
+                </button>
+            )}
         </div>
       ) : (
         <>

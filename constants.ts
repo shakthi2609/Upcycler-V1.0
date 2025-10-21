@@ -22,7 +22,7 @@ The JSON structure must follow this exact schema:
       "time_required": "e.g., 1-2 hours",
       "step_by_step_guide": ["Step 1: Clean the item.", "Step 2: Cut the item as described.", "Step 3: Assemble the parts.", ...],
       "variations_and_alternatives": ["Suggestion 1: e.g., 'Instead of paint, try using decorative washi tape.'", "Suggestion 2: e.g., 'You can use a glass jar instead of a plastic bottle for a more sturdy result.'"],
-      "ai_image_prompt": "A detailed, descriptive prompt for an AI image generator to create a visually appealing image of the finished project. For example: 'A beautifully crafted bird feeder made from a plastic bottle, painted blue, hanging from a tree branch in a sunny garden, photorealistic style.'",
+      "ai_image_prompt": "A detailed, descriptive prompt for an AI image generator to create a visually appealing, high-quality image of the finished project. The prompt MUST be artistic and include professional photography keywords. For example: 'Award-winning product photography of a beautifully crafted bird feeder made from a recycled plastic bottle, painted a vibrant blue. The feeder is hanging from a leafy tree branch in a sunny garden with soft natural lighting, creating a warm and inviting atmosphere. Hyperrealistic, detailed, 8k.'",
       "youtube_search_query": "A specific, actionable search query for YouTube to find a tutorial video. The query must include the main recycled item(s) used in the project. For example, 'how to make a bird feeder out of a plastic bottle' is better than a generic query like 'DIY bird feeder'."
     }
   ]
