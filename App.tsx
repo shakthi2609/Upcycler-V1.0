@@ -12,7 +12,9 @@ import ProjectDetailView from './components/ProjectDetailModal';
 import SavedProjects from './components/SavedProjects';
 import ChatView from './components/ChatView';
 import ApiKeyModal from './components/ApiKeyModal';
-import { CheckCircleIcon } from './components/icons';
+import { BackgroundPaths } from './components/ui/background-paths';
+import { Glow } from './components/ui/glow';
+import { Icons } from './components/icons';
 
 const App: React.FC = () => {
     const [apiKey, setApiKey] = useLocalStorage<string | null>('gemini-api-key', null);
@@ -139,10 +141,6 @@ const App: React.FC = () => {
         setIsApiKeyModalOpen(false);
         setError(null);
     };
-
-    if (!apiKey) {
-        return <ApiKeyModal onSave={setApiKey} />;
-    }
     
     const TabButton: React.FC<{tabName: 'new' | 'saved' | 'chat', label: string, count?: number}> = ({tabName, label, count}) => {
         const isActive = activeTab === tabName;
@@ -151,13 +149,13 @@ const App: React.FC = () => {
               onClick={() => setActiveTab(tabName)}
               className={`py-3 px-5 text-center font-semibold rounded-t-lg border-b-4 transition-colors focus:outline-none ${
                 isActive 
-                ? 'border-green-600 text-green-700' 
-                : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+                ? 'border-green-500 text-green-400' 
+                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
               {label}
               {count !== undefined && count > 0 && (
-                <span className={`ml-2 text-xs font-bold rounded-full px-2 py-0.5 ${isActive ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                <span className={`ml-2 text-xs font-bold rounded-full px-2 py-0.5 ${isActive ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-200'}`}>
                     {count}
                 </span>
               )}
@@ -168,8 +166,8 @@ const App: React.FC = () => {
     const renderDashboard = () => (
         <div className="space-y-8">
              <div className="text-center pt-4">
-                <h2 className="text-3xl font-bold text-gray-800">Your Upcycling Workshop</h2>
-                <p className="text-gray-600 mt-1">Turn today's trash into tomorrow's treasure.</p>
+                <h2 className="text-3xl font-bold text-gray-50">Your Upcycling Workshop</h2>
+                <p className="text-gray-400 mt-1">Turn today's trash into tomorrow's treasure.</p>
             </div>
             <ImageUploader
                 onImagesSelect={setImageFiles}
@@ -181,7 +179,7 @@ const App: React.FC = () => {
             <ErrorAlert message={error || ''} />
             
             <div className="mt-12">
-                <div className="border-b border-gray-200">
+                <div className="border-b border-gray-700">
                     <nav className="-mb-px flex justify-center space-x-6" aria-label="Tabs">
                         <TabButton tabName="new" label="New Ideas" count={analysisResult?.project_ideas.length} />
                         <TabButton tabName="saved" label="My Projects" count={savedProjects.length} />
@@ -206,7 +204,7 @@ const App: React.FC = () => {
                     )}
                     {activeTab === 'new' && !isLoading && !analysisResult && (
                         <div className="text-center py-12 text-gray-500">
-                            <CheckCircleIcon className="w-16 h-16 mx-auto text-gray-300 mb-2"/>
+                            <Icons.checkCircle className="w-16 h-16 mx-auto text-gray-600 mb-2"/>
                             <p>Analyzed ideas will appear here.</p>
                         </div>
                     )}
@@ -224,9 +222,30 @@ const App: React.FC = () => {
             </div>
         </div>
     );
+    
+    if (!apiKey) {
+        return (
+            <>
+                <BackgroundPaths
+                    title="Upcycle AI v2"
+                    buttonText="Enter Your API Key"
+                    onButtonClick={() => setIsApiKeyModalOpen(true)}
+                />
+                {isApiKeyModalOpen && (
+                    <ApiKeyModal
+                        onSave={handleSaveApiKey}
+                        onClose={() => setIsApiKeyModalOpen(false)}
+                    />
+                )}
+            </>
+        );
+    }
 
     return (
-        <div className="bg-gray-50 min-h-screen font-sans">
+        <div className="relative w-full min-h-screen bg-zinc-900 overflow-hidden font-sans">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <Glow className="opacity-50 scale-125 blur-3xl" />
+            </div>
             {isApiKeyModalOpen && (
                 <ApiKeyModal
                     onSave={handleSaveApiKey}
@@ -234,25 +253,27 @@ const App: React.FC = () => {
                 />
             )}
             
-            <Header onEditApiKey={() => setIsApiKeyModalOpen(true)} />
+            <div className="relative z-10 w-full h-full overflow-y-auto">
+                <Header onEditApiKey={() => setIsApiKeyModalOpen(true)} />
 
-            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {selectedProject ? (
-                    <ProjectDetailView
-                        project={selectedProject}
-                        onBack={() => setSelectedProject(null)}
-                        onDelete={handleDeleteProject}
-                        onAddJournalEntry={handleAddJournalEntry}
-                        onGenerateImage={() => {
-                            if (selectedProject?.id) {
-                                handleGenerateSingleImage(selectedProject.id, selectedProject.ai_image_prompt)
-                            }
-                        }}
-                    />
-                ) : (
-                    renderDashboard()
-                )}
-            </main>
+                <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    {selectedProject ? (
+                        <ProjectDetailView
+                            project={selectedProject}
+                            onBack={() => setSelectedProject(null)}
+                            onDelete={handleDeleteProject}
+                            onAddJournalEntry={handleAddJournalEntry}
+                            onGenerateImage={() => {
+                                if (selectedProject?.id) {
+                                    handleGenerateSingleImage(selectedProject.id, selectedProject.ai_image_prompt)
+                                }
+                            }}
+                        />
+                    ) : (
+                        renderDashboard()
+                    )}
+                </main>
+            </div>
         </div>
     );
 };

@@ -13,7 +13,12 @@
     "react-dom": "^19.2.0",
     "@google/genai": "^1.25.0",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "framer-motion": "^11.2.12",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

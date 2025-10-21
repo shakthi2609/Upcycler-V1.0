@@ -1,6 +1,7 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
-import { CloseIcon, ImageIcon } from './icons';
+import { Icons } from './icons';
 
 interface ImageUploaderProps {
   onImagesSelect: (files: File[]) => void;
@@ -56,20 +57,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesSelect, onAnalyze
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    <div className="w-full max-w-3xl mx-auto bg-zinc-900/80 backdrop-blur-md p-8 rounded-xl shadow-lg border border-zinc-700">
       <div className="flex flex-col items-center space-y-6">
         <div className="w-full">
-            <p className="text-center text-gray-600 mb-4">Upload one or more images of your recyclable items. The AI will try to find a project connecting them!</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-gray-50">
+            <p className="text-center text-gray-400 mb-4">Upload one or more images of your recyclable items. The AI will try to find a project connecting them!</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-zinc-950/60 border-zinc-700">
                 {filesWithPreviews.map(({ url }, index) => (
                     <div key={index} className="relative group aspect-square">
                         <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover rounded-lg shadow-md" />
                         <button
                             onClick={() => handleRemoveImage(index)}
-                            className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 focus:opacity-100"
+                            className="absolute top-1 right-1 bg-black bg-opacity-70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 focus:opacity-100"
                             aria-label={`Remove image ${index + 1}`}
                         >
-                            <CloseIcon className="w-4 h-4" />
+                            <Icons.close className="w-4 h-4" />
                         </button>
                     </div>
                 ))}
@@ -88,10 +89,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesSelect, onAnalyze
                     htmlFor="file-upload"
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
-                    className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col justify-center items-center text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition-colors"
+                    className="aspect-square border-2 border-dashed border-zinc-600 rounded-lg flex flex-col justify-center items-center text-center cursor-pointer hover:border-green-500 hover:bg-green-900/20 transition-colors"
                 >
-                    <ImageIcon className="h-8 w-8 text-gray-400 mb-1" />
-                    <span className="text-sm font-medium text-gray-600">Add Image</span>
+                    <Icons.image className="h-8 w-8 text-gray-500 mb-1" />
+                    <span className="text-sm font-medium text-gray-400">Add Image</span>
                 </label>
             </div>
         </div>
@@ -99,7 +100,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesSelect, onAnalyze
         <button
           onClick={onAnalyze}
           disabled={filesWithPreviews.length === 0 || isLoading}
-          className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out transform hover:scale-105"
+          className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-900 transition-all duration-200 ease-in-out transform hover:scale-105"
         >
           {isLoading ? 'Analyzing...' : `Get Ideas for ${filesWithPreviews.length} Image(s)`}
         </button>

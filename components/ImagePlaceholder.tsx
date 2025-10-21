@@ -1,5 +1,6 @@
 import React from 'react';
-import { ImageIcon } from './icons';
+// FIX: Corrected import to use the `Icons` object, as `ImageIcon` is not an exported member.
+import { Icons } from './icons';
 
 interface ImagePlaceholderProps {
   isLoading?: boolean;
@@ -37,7 +38,8 @@ const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({ isLoading, error, o
         </div>
       ) : (
         <>
-            <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
+            {/* FIX: Replaced non-existent `ImageIcon` with the correct `Icons.image`. */}
+            <Icons.image className="w-10 h-10 text-gray-400 mb-2" />
             <button
                 onClick={onGenerateClick}
                 className="mt-2 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"

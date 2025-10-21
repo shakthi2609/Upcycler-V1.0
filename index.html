@@ -8,12 +8,39 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @layer base {
+        :root {
+          --brand: 27 96% 61%;
+          --brand-foreground: 31 97% 72%;
+        }
+      
+        .dark {
+          --brand: 31 97% 72%;
+          --brand-foreground: 27 96% 61%
+        }
+      }
+    </style>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
+            colors: {
+              brand: "hsl(var(--brand))",
+              "brand-foreground": "hsl(var(--brand-foreground))",
+            },
             fontFamily: {
               sans: ['Poppins', 'sans-serif'],
+            },
+            keyframes: {
+              "appear-zoom": {
+                "0%": { opacity: "0", transform: "scale(0.95)" },
+                "100%": { opacity: "1", transform: "scale(1)" },
+              },
+            },
+            animation: {
+              "appear-zoom": "appear-zoom 0.5s ease-out forwards",
             },
           },
         },
@@ -28,12 +55,17 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
     "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
-    "remark-gfm": "https://aistudiocdn.com/remark-gfm@^4.0.1"
+    "remark-gfm": "https://aistudiocdn.com/remark-gfm@^4.0.1",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.2.12",
+    "@radix-ui/react-slot": "https://aistudiocdn.com/@radix-ui/react-slot@^1.1.0",
+    "class-variance-authority": "https://aistudiocdn.com/class-variance-authority@^0.7.0",
+    "clsx": "https://aistudiocdn.com/clsx@^2.1.1",
+    "tailwind-merge": "https://aistudiocdn.com/tailwind-merge@^2.3.0"
   }
 }
 </script>
 </head>
-  <body>
+  <body class="dark">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

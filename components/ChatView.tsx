@@ -1,9 +1,12 @@
 
+
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from "@google/genai";
 import type { ChatMessage as ChatMessageType } from '../types';
 import ChatMessage from './ChatMessage';
-import { PaperAirplaneIcon } from './icons';
+import { Icons } from './icons';
 
 const ChatView: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -75,44 +78,44 @@ const ChatView: React.FC = () => {
     };
     
     if (error && messages.length === 0) {
-        return <div className="text-center p-8 bg-red-100 text-red-700 rounded-lg">{error}</div>
+        return <div className="text-center p-8 bg-red-900/40 text-red-300 rounded-lg">{error}</div>
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-150px)] max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+        <div className="flex flex-col h-[calc(100vh-250px)] max-w-3xl mx-auto bg-zinc-900/80 backdrop-blur-md shadow-lg rounded-lg border border-zinc-700">
             <div className="flex-1 p-6 overflow-y-auto">
                 {messages.map((msg, index) => (
                     <ChatMessage key={index} message={msg} />
                 ))}
                 {isLoading && (
                     <div className="flex justify-start mb-4">
-                        <div className="max-w-xl px-4 py-3 rounded-2xl bg-gray-200 text-gray-800 rounded-bl-none">
+                        <div className="max-w-xl px-4 py-3 rounded-2xl bg-zinc-700 text-gray-200 rounded-bl-none">
                             <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-75"></div>
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
                             </div>
                         </div>
                     </div>
                 )}
                 <div ref={messagesEndRef} />
             </div>
-             <div className="p-4 border-t">
+             <div className="p-4 border-t border-zinc-700">
                 <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
                     <input
                         type="text"
                         value={userInput}
                         onChange={(e) => setUserInput(e.target.value)}
                         placeholder="Ask anything about upcycling..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="flex-1 px-4 py-2 border border-zinc-600 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 bg-zinc-800 text-gray-200"
                         disabled={isLoading || !!error}
                     />
                     <button
                         type="submit"
                         disabled={isLoading || !userInput.trim() || !!error}
-                        className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                        className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
                     >
-                        <PaperAirplaneIcon className="w-5 h-5" />
+                        <Icons.paperAirplane className="w-5 h-5" />
                     </button>
                 </form>
             </div>
