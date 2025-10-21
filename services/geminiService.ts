@@ -1,5 +1,4 @@
-
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import type { AnalysisResult } from '../types';
 
@@ -63,10 +62,14 @@ export const analyzeImage = async (imageFiles: File[], apiKey: string): Promise<
                                         type: Type.ARRAY,
                                         items: { type: Type.STRING },
                                     },
+                                    variations_and_alternatives: {
+                                        type: Type.ARRAY,
+                                        items: { type: Type.STRING },
+                                    },
                                     ai_image_prompt: { type: Type.STRING },
                                     youtube_search_query: { type: Type.STRING },
                                 },
-                                required: ["project_name", "description", "materials_used", "difficulty", "time_required", "step_by_step_guide", "ai_image_prompt", "youtube_search_query"],
+                                required: ["project_name", "description", "materials_used", "difficulty", "time_required", "step_by_step_guide", "variations_and_alternatives", "ai_image_prompt", "youtube_search_query"],
                             },
                         },
                     },
@@ -99,48 +102,21 @@ export const analyzeImage = async (imageFiles: File[], apiKey: string): Promise<
     }
 };
 
-export const generateProjectImage = async (prompt: string, apiKey: string): Promise<string> => {
+export const generateProjectImage = async (prompt: string): Promise<string> => {
     try {
-        if (!apiKey) {
-            throw new Error("Please provide your API key in the settings.");
-        }
-        const ai = getAiClient(apiKey);
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-            config: {
-                responseModalities: [Modality.IMAGE],
-            },
-          });
+        // Using Pollinations.ai for free, key-less image generation.
+        // The API returns an image directly from the URL.
+        const encodedPrompt = encodeURIComponent(prompt);
+        // Added some parameters for better image quality based on Pollinations docs
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true`;
 
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-              const base64ImageBytes: string = part.inlineData.data;
-              return `data:image/png;base64,${base64ImageBytes}`;
-            }
-        }
-        
-        throw new Error("No image data found in the API response.");
+        // The API doesn't require a fetch call; the URL itself is the result.
+        // We'll return it as a resolved promise to maintain the async function signature.
+        return Promise.resolve(imageUrl);
 
     } catch (error) {
         console.error("Image Generation Error:", error);
         if (error instanceof Error) {
-            if (error.message.includes('API key not valid')) {
-                throw new Error("API key not valid.");
-            }
-            const errorMessage = error.message.toLowerCase();
-            if(errorMessage.includes('safety')) {
-                throw new Error("The image was blocked due to safety settings.");
-            }
-            if (errorMessage.includes('quota')) {
-                throw new Error("Quota exceeded. Please request a higher limit for your project in Google Cloud.");
-            }
             throw new Error(`An error occurred while generating the image: ${error.message}`);
         }
         throw new Error("An unknown error occurred while generating the image.");

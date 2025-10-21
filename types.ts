@@ -6,6 +6,7 @@ export interface ProjectIdea {
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   time_required: string;
   step_by_step_guide: string[];
+  variations_and_alternatives: string[];
   ai_image_prompt: string;
   youtube_search_query: string;
   imageUrl?: string;

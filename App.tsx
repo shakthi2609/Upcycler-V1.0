@@ -69,12 +69,6 @@ const App: React.FC = () => {
     }, [imageFiles, apiKey]);
 
     const handleGenerateSingleImage = useCallback(async (projectId: string) => {
-        if (!apiKey) {
-            setError("Please set your API key before generating images.");
-            setIsApiKeyModalOpen(true);
-            return;
-        }
-        
         setAnalysisResult(prev => {
             if (!prev) return null;
             return {
@@ -89,7 +83,7 @@ const App: React.FC = () => {
         if (!project) return;
 
         try {
-            const imageUrl = await generateProjectImage(project.ai_image_prompt, apiKey);
+            const imageUrl = await generateProjectImage(project.ai_image_prompt);
             setAnalysisResult(prev => {
                 if (!prev) return null;
                 return {
@@ -102,9 +96,6 @@ const App: React.FC = () => {
         } catch (imgErr) {
             console.error(`Failed to generate image for "${project.project_name}":`, imgErr);
             const errorMessage = imgErr instanceof Error ? imgErr.message : "Failed to generate.";
-            if (errorMessage.toLowerCase().includes("api key not valid")) {
-                setIsApiKeyModalOpen(true);
-            }
             setAnalysisResult(prev => {
                 if (!prev) return null;
                 return {
@@ -115,7 +106,7 @@ const App: React.FC = () => {
                 };
             });
         }
-    }, [analysisResult, apiKey]);
+    }, [analysisResult]);
     
     const handleSaveProject = (projectToSave: ProjectIdea) => {
         const isAlreadySaved = savedProjects.some(p => p.project_name === projectToSave.project_name);

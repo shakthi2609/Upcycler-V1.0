@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from "@google/genai";
 import type { ProjectIdea, ChatMessage as ChatMessageType } from '../types';

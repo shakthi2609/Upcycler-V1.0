@@ -43,6 +43,16 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, onBack }
                       ))}
                     </ul>
                 </div>
+                {project.variations_and_alternatives && project.variations_and_alternatives.length > 0 && (
+                     <div className="mb-6">
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-3">Variations & Alternatives</h3>
+                        <ul className="list-disc list-inside space-y-2 text-gray-700">
+                          {project.variations_and_alternatives.map((variation, index) => (
+                            <li key={index}>{variation}</li>
+                          ))}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             {/* Right Column */}
