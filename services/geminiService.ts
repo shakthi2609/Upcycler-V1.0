@@ -3,8 +3,11 @@ import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import type { AnalysisResult } from '../types';
 
-const getAiClient = (): GoogleGenAI => {
-    return new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAiClient = (apiKey: string): GoogleGenAI => {
+    if (!apiKey) {
+        throw new Error("API key is missing.");
+    }
+    return new GoogleGenAI({ apiKey });
 };
 
 const fileToGenerativePart = async (file: File) => {
@@ -18,9 +21,12 @@ const fileToGenerativePart = async (file: File) => {
     };
 };
 
-export const analyzeImage = async (imageFiles: File[]): Promise<AnalysisResult> => {
+export const analyzeImage = async (imageFiles: File[], apiKey: string): Promise<AnalysisResult> => {
     try {
-        const ai = getAiClient();
+        if (!apiKey) {
+            throw new Error("Please provide your API key in the settings.");
+        }
+        const ai = getAiClient(apiKey);
         const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
 
         const response = await ai.models.generateContent({
@@ -81,6 +87,9 @@ export const analyzeImage = async (imageFiles: File[]): Promise<AnalysisResult> 
     } catch (error) {
         console.error("Gemini API Error:", error);
         if (error instanceof Error) {
+            if (error.message.includes('API key not valid')) {
+                throw new Error("Your API key is not valid. Please check it and try again.");
+            }
             if(error.message.includes('SAFETY')) {
                 throw new Error("The image could not be processed due to safety settings. Please try a different image.");
             }
@@ -90,9 +99,12 @@ export const analyzeImage = async (imageFiles: File[]): Promise<AnalysisResult> 
     }
 };
 
-export const generateProjectImage = async (prompt: string): Promise<string> => {
+export const generateProjectImage = async (prompt: string, apiKey: string): Promise<string> => {
     try {
-        const ai = getAiClient();
+        if (!apiKey) {
+            throw new Error("Please provide your API key in the settings.");
+        }
+        const ai = getAiClient(apiKey);
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image',
             contents: {
@@ -119,6 +131,9 @@ export const generateProjectImage = async (prompt: string): Promise<string> => {
     } catch (error) {
         console.error("Image Generation Error:", error);
         if (error instanceof Error) {
+            if (error.message.includes('API key not valid')) {
+                throw new Error("API key not valid.");
+            }
             const errorMessage = error.message.toLowerCase();
             if(errorMessage.includes('safety')) {
                 throw new Error("The image was blocked due to safety settings.");

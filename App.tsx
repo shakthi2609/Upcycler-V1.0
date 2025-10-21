@@ -12,8 +12,12 @@ import ProjectCard from './components/ProjectCard';
 import ProjectDetailView from './components/ProjectDetailModal';
 import SavedProjects from './components/SavedProjects';
 import ChatView from './components/ChatView';
+import ApiKeyModal from './components/ApiKeyModal';
 
 const App: React.FC = () => {
+    const [apiKey, setApiKey] = useLocalStorage<string | null>('gemini-api-key', null);
+    const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -23,6 +27,12 @@ const App: React.FC = () => {
     const [savedProjects, setSavedProjects] = useLocalStorage<ProjectIdea[]>('savedProjects', []);
     
     const handleAnalyzeClick = useCallback(async () => {
+        if (!apiKey) {
+            setError("Please set your API key first.");
+            setIsApiKeyModalOpen(true);
+            return;
+        }
+
         if (imageFiles.length === 0) {
             setError('Please select at least one image first.');
             return;
@@ -33,13 +43,12 @@ const App: React.FC = () => {
         setAnalysisResult(null);
 
         try {
-            const result = await analyzeImage(imageFiles);
+            const result = await analyzeImage(imageFiles, apiKey);
             
-            // Assign IDs but do not trigger image generation automatically
             const projectsWithIds = result.project_ideas.map(p => ({
                 ...p,
                 id: window.uuid.v4(),
-                isGeneratingImage: false, // Default to false
+                isGeneratingImage: false,
                 imageUrl: undefined,
             }));
             
@@ -47,6 +56,9 @@ const App: React.FC = () => {
 
         } catch (err) {
             if (err instanceof Error) {
+                if (err.message.includes("API key is not valid")) {
+                    setIsApiKeyModalOpen(true);
+                }
                 setError(err.message);
             } else {
                 setError('An unknown error occurred.');
@@ -54,10 +66,15 @@ const App: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [imageFiles]);
+    }, [imageFiles, apiKey]);
 
     const handleGenerateSingleImage = useCallback(async (projectId: string) => {
-        // Set loading state for the specific project
+        if (!apiKey) {
+            setError("Please set your API key before generating images.");
+            setIsApiKeyModalOpen(true);
+            return;
+        }
+        
         setAnalysisResult(prev => {
             if (!prev) return null;
             return {
@@ -72,7 +89,7 @@ const App: React.FC = () => {
         if (!project) return;
 
         try {
-            const imageUrl = await generateProjectImage(project.ai_image_prompt);
+            const imageUrl = await generateProjectImage(project.ai_image_prompt, apiKey);
             setAnalysisResult(prev => {
                 if (!prev) return null;
                 return {
@@ -85,6 +102,9 @@ const App: React.FC = () => {
         } catch (imgErr) {
             console.error(`Failed to generate image for "${project.project_name}":`, imgErr);
             const errorMessage = imgErr instanceof Error ? imgErr.message : "Failed to generate.";
+            if (errorMessage.toLowerCase().includes("api key not valid")) {
+                setIsApiKeyModalOpen(true);
+            }
             setAnalysisResult(prev => {
                 if (!prev) return null;
                 return {
@@ -95,12 +115,11 @@ const App: React.FC = () => {
                 };
             });
         }
-    }, [analysisResult]);
+    }, [analysisResult, apiKey]);
     
     const handleSaveProject = (projectToSave: ProjectIdea) => {
         const isAlreadySaved = savedProjects.some(p => p.project_name === projectToSave.project_name);
         if (!isAlreadySaved) {
-            // Ensure the project being saved has a consistent ID and includes the image URL if it exists
             const newProject = { ...projectToSave, id: projectToSave.id || window.uuid.v4() };
             setSavedProjects(prev => [...prev, newProject]);
         }
@@ -113,6 +132,16 @@ const App: React.FC = () => {
     const isProjectSaved = (projectName: string) => {
         return savedProjects.some(p => p.project_name === projectName);
     };
+
+    const handleSaveApiKey = (key: string) => {
+        setApiKey(key);
+        setIsApiKeyModalOpen(false);
+        setError(null); // Clear any previous API key errors
+    };
+
+    if (!apiKey) {
+        return <ApiKeyModal onSave={setApiKey} />;
+    }
 
     const renderHomeView = () => (
         <div className="space-y-8">
@@ -178,10 +207,18 @@ const App: React.FC = () => {
 
     return (
         <div className="bg-gray-50 min-h-screen font-sans">
+            {isApiKeyModalOpen && (
+                <ApiKeyModal
+                    onSave={handleSaveApiKey}
+                    onClose={() => setIsApiKeyModalOpen(false)}
+                />
+            )}
+            
             <Header
                 currentView={currentView}
                 setCurrentView={setCurrentView}
                 savedProjectsCount={savedProjects.length}
+                onEditApiKey={() => setIsApiKeyModalOpen(true)}
             />
 
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

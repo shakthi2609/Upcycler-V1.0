@@ -26,7 +26,12 @@ const ProjectChat: React.FC<ProjectChatProps> = ({ project }) => {
 
         const initChat = () => {
             try {
-                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+                const apiKey = JSON.parse(localStorage.getItem('gemini-api-key') || 'null');
+                if (!apiKey) {
+                    setError('Gemini API key not found. Please set it on the home page.');
+                    return;
+                }
+                const ai = new GoogleGenAI({ apiKey });
                 chatRef.current = ai.chats.create({
                     model: 'gemini-2.5-pro',
                     config: { systemInstruction },
@@ -106,11 +111,11 @@ const ProjectChat: React.FC<ProjectChatProps> = ({ project }) => {
                             onChange={(e) => setUserInput(e.target.value)}
                             placeholder="e.g., Can I use a different material?"
                             className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                            disabled={isLoading}
+                            disabled={isLoading || !!error}
                         />
                         <button
                             type="submit"
-                            disabled={isLoading || !userInput.trim()}
+                            disabled={isLoading || !userInput.trim() || !!error}
                             className="bg-green-600 text-white p-2.5 rounded-full hover:bg-green-700 disabled:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                         >
                             <PaperAirplaneIcon className="w-5 h-5" />
