@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import type { AnalysisResult, ProjectIdea } from './types';
 import { analyzeImage, generateProjectImage } from './services/geminiService';
@@ -10,12 +11,9 @@ import ErrorAlert from './components/ErrorAlert';
 import ProjectCard from './components/ProjectCard';
 import ProjectDetailView from './components/ProjectDetailModal';
 import SavedProjects from './components/SavedProjects';
-import ApiKeyModal from './components/ApiKeyModal';
 import ChatView from './components/ChatView';
 
 const App: React.FC = () => {
-    const [apiKey, setApiKey] = useState<string | null>(() => localStorage.getItem('gemini-api-key'));
-    const [isEditKeyModalOpen, setIsEditKeyModalOpen] = useState(false);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,12 +22,6 @@ const App: React.FC = () => {
     const [currentView, setCurrentView] = useState<'home' | 'saved' | 'chat'>('home');
     const [savedProjects, setSavedProjects] = useLocalStorage<ProjectIdea[]>('savedProjects', []);
     
-    const handleSaveApiKey = (key: string) => {
-        localStorage.setItem('gemini-api-key', key);
-        setApiKey(key);
-        setIsEditKeyModalOpen(false); // Close the modal if it was open for editing
-    };
-
     const handleAnalyzeClick = useCallback(async () => {
         if (imageFiles.length === 0) {
             setError('Please select at least one image first.');
@@ -186,34 +178,20 @@ const App: React.FC = () => {
 
     return (
         <div className="bg-gray-50 min-h-screen font-sans">
-            {/* Initial API Key Modal */}
-            {!apiKey && <ApiKeyModal onSave={handleSaveApiKey} />}
-            
-            {/* Edit API Key Modal */}
-            {isEditKeyModalOpen && (
-                <ApiKeyModal 
-                    onSave={handleSaveApiKey} 
-                    onClose={() => setIsEditKeyModalOpen(false)}
-                />
-            )}
-            
             <Header
                 currentView={currentView}
                 setCurrentView={setCurrentView}
                 savedProjectsCount={savedProjects.length}
-                onEditApiKey={apiKey ? () => setIsEditKeyModalOpen(true) : undefined}
             />
 
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {apiKey && (
-                    selectedProject ? (
-                        <ProjectDetailView
-                            project={selectedProject}
-                            onBack={() => setSelectedProject(null)}
-                        />
-                    ) : (
-                        renderCurrentView()
-                    )
+                {selectedProject ? (
+                    <ProjectDetailView
+                        project={selectedProject}
+                        onBack={() => setSelectedProject(null)}
+                    />
+                ) : (
+                    renderCurrentView()
                 )}
             </main>
 

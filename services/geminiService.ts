@@ -1,14 +1,10 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import type { AnalysisResult } from '../types';
 
 const getAiClient = (): GoogleGenAI => {
-    const apiKey = localStorage.getItem('gemini-api-key');
-    if (!apiKey) {
-        throw new Error("API key not found in local storage. Please set it.");
-    }
-    // Remove the `replace` call that's causing the issue
-    return new GoogleGenAI({ apiKey: apiKey.trim() });
+    return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 const fileToGenerativePart = async (file: File) => {
@@ -85,11 +81,6 @@ export const analyzeImage = async (imageFiles: File[]): Promise<AnalysisResult> 
     } catch (error) {
         console.error("Gemini API Error:", error);
         if (error instanceof Error) {
-            if(error.message.includes('API key not valid')) {
-                // Force user to re-enter key
-                localStorage.removeItem('gemini-api-key');
-                window.location.reload();
-            }
             if(error.message.includes('SAFETY')) {
                 throw new Error("The image could not be processed due to safety settings. Please try a different image.");
             }
@@ -129,11 +120,6 @@ export const generateProjectImage = async (prompt: string): Promise<string> => {
         console.error("Image Generation Error:", error);
         if (error instanceof Error) {
             const errorMessage = error.message.toLowerCase();
-             if(errorMessage.includes('api key not valid')) {
-                // Force user to re-enter key
-                localStorage.removeItem('gemini-api-key');
-                window.location.reload();
-            }
             if(errorMessage.includes('safety')) {
                 throw new Error("The image was blocked due to safety settings.");
             }

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from "@google/genai";
 import type { ChatMessage as ChatMessageType } from '../types';
@@ -15,9 +16,7 @@ const ChatView: React.FC = () => {
     useEffect(() => {
         const initChat = () => {
             try {
-                const apiKey = localStorage.getItem('gemini-api-key');
-                if (!apiKey) throw new Error("API Key not found");
-                const ai = new GoogleGenAI({ apiKey });
+                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
                 chatRef.current = ai.chats.create({
                     model: 'gemini-2.5-pro',
                     config: {

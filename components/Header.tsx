@@ -1,14 +1,13 @@
+
 import React from 'react';
-import { PencilIcon } from './icons';
 
 interface HeaderProps {
     currentView: 'home' | 'saved' | 'chat';
     setCurrentView: (view: 'home' | 'saved' | 'chat') => void;
     savedProjectsCount: number;
-    onEditApiKey?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, savedProjectsCount, onEditApiKey }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, savedProjectsCount }) => {
   
     const baseClasses = "px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500";
     const activeClasses = "bg-green-600 text-white";
@@ -40,15 +39,6 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, savedProje
                             )}
                         </button>
                     </nav>
-                    {onEditApiKey && (
-                        <button
-                            onClick={onEditApiKey}
-                            className="p-2 rounded-full text-gray-600 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                            aria-label="Edit API Key"
-                        >
-                            <PencilIcon className="w-5 h-5" />
-                        </button>
-                    )}
                 </div>
             </div>
         </header>
