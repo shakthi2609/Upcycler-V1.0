@@ -1,6 +1,6 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
-import type { AnalysisResult } from '../types';
+import type { AnalysisResult, ProjectIdea } from '../types';
 
 const getAiClient = (apiKey: string): GoogleGenAI => {
     if (!apiKey) {
@@ -20,7 +20,7 @@ const fileToGenerativePart = async (file: File) => {
     };
 };
 
-export const analyzeImage = async (imageFiles: File[], apiKey: string): Promise<AnalysisResult> => {
+export const analyzeImage = async (imageFiles: File[], apiKey: string, dislikedProjects: ProjectIdea[] = []): Promise<AnalysisResult> => {
     try {
         if (!apiKey) {
             throw new Error("Please provide your API key in the settings.");
@@ -28,58 +28,58 @@ export const analyzeImage = async (imageFiles: File[], apiKey: string): Promise<
         const ai = getAiClient(apiKey);
         const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
 
+        const textParts = [{ text: SYSTEM_PROMPT }];
+
+        if (dislikedProjects.length > 0) {
+            const feedbackPrompt = `\n\nIMPORTANT CONTEXT: The user has previously disliked the following project ideas. Avoid generating suggestions that are similar in concept or materials.
+            Disliked Projects:
+            ${dislikedProjects.map(p => `- ${p.project_name}: ${p.description}`).join('\n')}
+            `;
+            textParts.push({ text: feedbackPrompt });
+        }
+
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-2.5-flash',
             contents: [{
                 parts: [
-                    { text: SYSTEM_PROMPT },
+                    ...textParts,
                     ...imageParts
                 ],
             }],
             config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        identified_items: {
-                            type: Type.ARRAY,
-                            items: { type: Type.STRING },
-                        },
-                        project_ideas: {
-                            type: Type.ARRAY,
-                            items: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    project_name: { type: Type.STRING },
-                                    description: { type: Type.STRING },
-                                    materials_used: {
-                                        type: Type.ARRAY,
-                                        items: { type: Type.STRING },
-                                    },
-                                    difficulty: { type: Type.STRING },
-                                    time_required: { type: Type.STRING },
-                                    step_by_step_guide: {
-                                        type: Type.ARRAY,
-                                        items: { type: Type.STRING },
-                                    },
-                                    variations_and_alternatives: {
-                                        type: Type.ARRAY,
-                                        items: { type: Type.STRING },
-                                    },
-                                    ai_image_prompt: { type: Type.STRING },
-                                    youtube_search_query: { type: Type.STRING },
-                                },
-                                required: ["project_name", "description", "materials_used", "difficulty", "time_required", "step_by_step_guide", "variations_and_alternatives", "ai_image_prompt", "youtube_search_query"],
-                            },
-                        },
-                    },
-                    required: ["identified_items", "project_ideas"],
-                },
+                tools: [{googleSearch: {}}],
             },
         });
         
-        const jsonText = response.text.trim();
+        const responseText = response.text.trim();
+        // The model may return markdown ```json ... ```, so we extract the JSON part.
+        const jsonMatch = responseText.match(/```(json)?\s*(\{[\s\S]*\})\s*```/);
+        let jsonText: string;
+
+        if (jsonMatch && jsonMatch[2]) {
+            jsonText = jsonMatch[2];
+        } else {
+            // Fallback for plain JSON response
+            const jsonStartIndex = responseText.indexOf('{');
+            const jsonEndIndex = responseText.lastIndexOf('}');
+            if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+                jsonText = responseText.substring(jsonStartIndex, jsonEndIndex + 1);
+            } else {
+                throw new Error("Could not find a valid JSON object in the model's response.");
+            }
+        }
+        
         const result: AnalysisResult = JSON.parse(jsonText);
+
+        const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+        if (groundingMetadata?.groundingChunks) {
+            result.groundingSources = groundingMetadata.groundingChunks
+                .filter(chunk => chunk.web)
+                .map(chunk => ({
+                    uri: chunk.web!.uri,
+                    title: chunk.web!.title,
+                }));
+        }
 
         if (!result.identified_items || result.identified_items.length === 0) {
             throw new Error("No items were identified in the image. Please try again with a clearer photo against a plain background.");

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface ApiKeyModalProps {
   onSave: (apiKey: string) => void;
@@ -20,7 +21,13 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex justify-center items-center p-4">
-      <div className="bg-zinc-900/80 backdrop-blur-md rounded-lg shadow-2xl max-w-md w-full p-8 text-center border border-zinc-700">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="bg-zinc-900/80 backdrop-blur-md rounded-lg shadow-2xl max-w-md w-full p-8 text-center border border-zinc-700"
+      >
         <h2 className="text-2xl font-bold text-gray-100 mb-4">
             {isEditMode ? 'Update API Key' : 'Enter Gemini API Key'}
         </h2>
@@ -54,7 +61,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onSave, onClose }) => {
               {isEditMode ? 'Save Changes' : 'Save and Start Upcycling'}
             </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

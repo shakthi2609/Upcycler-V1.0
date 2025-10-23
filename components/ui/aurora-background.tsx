@@ -2,10 +2,11 @@
 import { cn } from "../../lib/utils";
 import React, { ReactNode } from "react";
 
-interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
+// FIX: Refactored to a type alias to resolve property not found error.
+type AuroraBackgroundProps = React.HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
   showRadialGradient?: boolean;
-}
+};
 
 export const AuroraBackground = ({
   className,

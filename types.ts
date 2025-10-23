@@ -20,11 +20,18 @@ export interface ProjectIdea {
   isGeneratingImage?: boolean;
   imageError?: string;
   journal?: JournalEntry[];
+  feedback?: 'up' | 'down';
+}
+
+export interface GroundingSource {
+  uri: string;
+  title: string;
 }
 
 export interface AnalysisResult {
   identified_items: string[];
   project_ideas: ProjectIdea[];
+  groundingSources?: GroundingSource[];
 }
 
 export interface ChatMessage {

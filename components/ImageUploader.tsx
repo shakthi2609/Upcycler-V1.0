@@ -1,6 +1,5 @@
-
-
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Icons } from './icons';
 
 interface ImageUploaderProps {
@@ -60,20 +59,30 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesSelect, onAnalyze
     <div className="w-full max-w-3xl mx-auto bg-zinc-900/80 backdrop-blur-md p-8 rounded-xl shadow-lg border border-zinc-700">
       <div className="flex flex-col items-center space-y-6">
         <div className="w-full">
-            <p className="text-center text-gray-400 mb-4">Upload one or more images of your recyclable items. The AI will try to find a project connecting them!</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-zinc-950/60 border-zinc-700">
-                {filesWithPreviews.map(({ url }, index) => (
-                    <div key={index} className="relative group aspect-square">
-                        <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover rounded-lg shadow-md" />
-                        <button
-                            onClick={() => handleRemoveImage(index)}
-                            className="absolute top-1 right-1 bg-black bg-opacity-70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 focus:opacity-100"
-                            aria-label={`Remove image ${index + 1}`}
+            <p className="text-center text-gray-400 mb-4">Upload one or more images of your recyclable items. The AI will find a project connecting them!</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-zinc-950/60 border-zinc-700 min-h-[120px]">
+                <AnimatePresence>
+                    {filesWithPreviews.map(({ url }, index) => (
+                        <motion.div
+                            key={url}
+                            layout
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                            className="relative group aspect-square"
                         >
-                            <Icons.close className="w-4 h-4" />
-                        </button>
-                    </div>
-                ))}
+                            <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover rounded-lg shadow-md" />
+                            <button
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute top-1 right-1 bg-black bg-opacity-70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 focus:opacity-100"
+                                aria-label={`Remove image ${index + 1}`}
+                            >
+                                <Icons.close className="w-4 h-4" />
+                            </button>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
                 
                 <input
                     type="file"
@@ -102,7 +111,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesSelect, onAnalyze
           disabled={filesWithPreviews.length === 0 || isLoading}
           className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-900 transition-all duration-200 ease-in-out transform hover:scale-105"
         >
-          {isLoading ? 'Analyzing...' : `Get Ideas for ${filesWithPreviews.length} Image(s)`}
+          {isLoading ? 'Creating Magic...' : `Get Ideas for ${filesWithPreviews.length} Image(s)`}
         </button>
       </div>
     </div>

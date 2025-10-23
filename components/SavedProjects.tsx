@@ -1,9 +1,8 @@
-
-
 import React from 'react';
 import type { ProjectIdea } from '../types';
 import { Icons } from './icons';
 import ImagePlaceholder from './ImagePlaceholder';
+import { motion } from 'framer-motion';
 
 interface SavedProjectsProps {
   projects: ProjectIdea[];
@@ -11,23 +10,44 @@ interface SavedProjectsProps {
   onDelete: (projectId: string) => void;
 }
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+};
+
+
 const SavedProjects: React.FC<SavedProjectsProps> = ({ projects, onSelect, onDelete }) => {
   if (projects.length === 0) {
     return (
-      <div className="text-center py-16">
-        <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-        </svg>
-        <h3 className="mt-2 text-sm font-medium text-gray-300">No saved projects</h3>
-        <p className="mt-1 text-sm text-gray-500">Get started by analyzing a photo of your waste items!</p>
+      <div className="text-center py-16 text-gray-500 bg-zinc-950/50 rounded-lg border-2 border-dashed border-zinc-700">
+        <Icons.folder className="w-16 h-16 mx-auto text-gray-600 mb-4"/>
+        <h3 className="text-lg font-semibold text-gray-300">Your Workshop is Empty</h3>
+        <p>Save your favorite project ideas to find them here later.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+    >
       {projects.map((project) => (
-        <div key={project.id} className="bg-zinc-900/80 backdrop-blur-md rounded-lg shadow-lg overflow-hidden flex flex-col transform hover:-translate-y-1 transition-transform duration-300 ease-in-out border border-zinc-700">
+        <motion.div
+            key={project.id}
+            variants={itemVariants}
+            className="bg-zinc-900/80 backdrop-blur-md rounded-lg shadow-lg overflow-hidden flex flex-col transform hover:-translate-y-1 transition-transform duration-300 ease-in-out border border-zinc-700"
+        >
           {project.imageUrl ? (
             <img src={project.imageUrl} alt={project.project_name} className="w-full h-48 object-cover" />
           ) : (
@@ -49,9 +69,9 @@ const SavedProjects: React.FC<SavedProjectsProps> = ({ projects, onSelect, onDel
               Delete
             </button>
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
 import type { ProjectIdea, JournalEntry } from '../types';
 import { Icons } from './icons';
 import ProjectChat from './ProjectChat';
@@ -12,16 +13,22 @@ interface ProjectDetailViewProps {
   onGenerateImage: () => void;
 }
 
+const InfoCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
+    <div className="bg-zinc-950/70 p-4 rounded-lg border border-zinc-700 flex items-center space-x-4">
+        <div className="flex-shrink-0 text-green-400">
+            {icon}
+        </div>
+        <div>
+            <h4 className="text-sm font-semibold text-gray-400">{title}</h4>
+            <div className="text-base font-medium text-gray-200">{children}</div>
+        </div>
+    </div>
+);
+
 const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, onBack, onDelete, onAddJournalEntry, onGenerateImage }) => {
   const [newNote, setNewNote] = useState('');
   const [newPhoto, setNewPhoto] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const difficultyColor = {
-    beginner: 'bg-green-900/50 text-green-300',
-    intermediate: 'bg-yellow-900/50 text-yellow-300',
-    advanced: 'bg-red-900/50 text-red-300',
-  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,8 +50,14 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, onBack, 
   };
 
   return (
-    <div className="bg-zinc-900/80 backdrop-blur-md rounded-lg shadow-xl max-w-5xl w-full mx-auto p-6 sm:p-8 lg:p-12 border border-zinc-700">
-        <div className="flex justify-between items-center mb-8">
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        className="bg-zinc-900/80 backdrop-blur-md rounded-lg shadow-xl max-w-5xl w-full mx-auto p-6 sm:p-8 lg:p-12 border border-zinc-700"
+    >
+        <div className="flex justify-between items-start mb-8">
             <button
                 onClick={onBack}
                 className="inline-flex items-center text-gray-300 hover:text-white transition-colors font-semibold text-lg"
@@ -60,59 +73,79 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, onBack, 
                 Delete Project
             </button>
         </div>
+        
+        <div className="mb-8">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-50 leading-tight">{project.project_name}</h2>
+            <p className="text-gray-400 mt-3 text-lg">{project.description}</p>
+        </div>
 
         <div className="flex flex-col md:flex-row md:space-x-10">
             {/* Left Column */}
-            <div className="md:w-5/12">
-                {project.imageUrl ? (
-                    <div className="mb-6">
-                        <img src={project.imageUrl} alt={project.project_name} className="w-full h-auto object-cover rounded-lg shadow-lg" />
-                    </div>
-                ) : (
-                     <div className="mb-6 w-full aspect-[4/3] rounded-lg shadow-lg overflow-hidden">
+            <div className="md:w-6/12 lg:w-5/12">
+                <div className="mb-6 w-full aspect-w-4 aspect-h-3 rounded-lg shadow-lg overflow-hidden border border-zinc-700">
+                    {project.imageUrl ? (
+                        <img src={project.imageUrl} alt={project.project_name} className="w-full h-full object-cover" />
+                    ) : (
                         <ImagePlaceholder 
                             isLoading={project.isGeneratingImage}
                             error={project.imageError}
                             onGenerateClick={onGenerateImage}
                         />
-                    </div>
-                )}
-                 <div className="mb-6">
-                    <h3 className="text-2xl font-semibold text-gray-100 mb-3">Materials Needed</h3>
-                    <ul className="list-disc list-inside space-y-2 text-gray-300">
-                      {project.materials_used.map((material, index) => (
-                        <li key={index}>{material}</li>
-                      ))}
-                    </ul>
+                    )}
                 </div>
-                {project.variations_and_alternatives && project.variations_and_alternatives.length > 0 && (
-                     <div className="mb-6">
-                        <h3 className="text-2xl font-semibold text-gray-100 mb-3">Variations & Alternatives</h3>
-                        <ul className="list-disc list-inside space-y-2 text-gray-300">
-                          {project.variations_and_alternatives.map((variation, index) => (
-                            <li key={index}>{variation}</li>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    {/* Fix: Added children to the InfoCard component to display the project difficulty, resolving the missing 'children' prop error. */}
+                    <InfoCard icon={<Icons.wrench className="w-6 h-6" />} title="Difficulty">
+                        <span className="capitalize">{project.difficulty}</span>
+                    </InfoCard>
+                    {/* Fix: Added children to the InfoCard component to display the required time, resolving the missing 'children' prop error. */}
+                    <InfoCard icon={<Icons.clock className="w-6 h-6" />} title="Time Required">
+                        {project.time_required}
+                    </InfoCard>
+                </div>
+                <div className="mb-6">
+                    {/* Fix: Added children to the InfoCard component to display the list of materials, resolving the missing 'children' prop error. */}
+                    <InfoCard icon={<Icons.list className="w-6 h-6" />} title="Materials Needed">
+                        <ul className="list-disc list-inside text-sm">
+                          {project.materials_used.map((material, index) => (
+                            <li key={index}>{material}</li>
                           ))}
                         </ul>
-                    </div>
-                )}
+                    </InfoCard>
+                </div>
             </div>
 
             {/* Right Column */}
-            <div className="md:w-7/12">
-                <div className="mb-6">
-                  <h2 className="text-4xl lg:text-5xl font-bold text-gray-50 leading-tight">{project.project_name}</h2>
-                  <p className="text-gray-400 mt-3 text-lg">{project.description}</p>
-                </div>
-
-                <div className="mb-8 flex items-center space-x-4 text-gray-300">
-                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${difficultyColor[project.difficulty] || 'bg-gray-700 text-gray-300'}`}>
-                        {project.difficulty.charAt(0).toUpperCase() + project.difficulty.slice(1)}
-                      </span>
-                      <span className="font-medium">Est. Time: {project.time_required}</span>
-                </div>
+            <div className="md:w-6/12 lg:w-7/12">
+                <div className="border-t-2 border-green-500/50 pt-6 mb-8">
+                    <h3 className="text-3xl font-semibold text-gray-100 mb-6">Step-by-Step Guide</h3>
+                    <ol className="space-y-6">
+                      {project.step_by_step_guide.map((step, index) => (
+                        <li key={index} className="flex items-start">
+                            <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 bg-zinc-800 border border-zinc-700 text-green-400 font-bold rounded-full mr-4">
+                                {index + 1}
+                            </div>
+                            <p className="text-gray-300 text-base md:text-lg leading-relaxed pt-0.5">{step}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                
+                {project.variations_and_alternatives && project.variations_and_alternatives.length > 0 && (
+                     <div className="mb-8 mt-10">
+                        <h3 className="text-2xl font-semibold text-gray-100 mb-4">Variations & Alternatives</h3>
+                        <div className="bg-zinc-950/70 p-4 rounded-lg border border-zinc-700">
+                            <ul className="list-disc list-inside space-y-2 text-gray-300">
+                              {project.variations_and_alternatives.map((variation, index) => (
+                                <li key={index}>{variation}</li>
+                              ))}
+                            </ul>
+                        </div>
+                    </div>
+                )}
                 
                 {project.youtube_search_query && (
-                  <div className="mb-8">
+                  <div className="mt-10">
                      <a
                         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(project.youtube_search_query)}`}
                         target="_blank"
@@ -127,18 +160,9 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, onBack, 
             </div>
         </div>
 
-      <div className="border-t border-zinc-700 pt-8 mt-8">
-        <h3 className="text-3xl font-semibold text-gray-100 mb-6">Step-by-Step Guide</h3>
-        <ol className="list-decimal list-inside space-y-4 text-gray-300 text-base md:text-lg">
-          {project.step_by_step_guide.map((step, index) => (
-            <li key={index} className="pl-2 leading-relaxed">{step}</li>
-          ))}
-        </ol>
-      </div>
-
-       <div className="border-t border-zinc-700 pt-8 mt-8">
+       <div className="border-t border-zinc-700 pt-8 mt-10">
           <h3 className="text-3xl font-semibold text-gray-100 mb-6">My Project Journal</h3>
-          <div className="bg-zinc-950/70 p-6 rounded-lg">
+          <div className="bg-zinc-950/70 p-6 rounded-lg border border-zinc-700">
             <div className="space-y-4 mb-6">
               <textarea
                 value={newNote}
@@ -184,7 +208,7 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, onBack, 
       <div className="mt-12">
         <ProjectChat project={project} />
       </div>
-    </div>
+    </motion.div>
   );
 };
 

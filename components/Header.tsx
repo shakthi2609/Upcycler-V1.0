@@ -10,12 +10,12 @@ const Header: React.FC<HeaderProps> = ({ onEditApiKey }) => {
         <header className="bg-zinc-900/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-zinc-700/80">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 01-.517-3.86l2.387-.477a2 2 0 01.547-1.806z" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5V4H4zm0 12h5v5H4v-5zm12 0h5v5h-5v-5zM9 9l6-6m-6 12l6-6" />
                         </svg>
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-50 tracking-tight">Upcycle AI <span className="text-green-400 font-semibold">v5</span></h1>
+                    <h1 className="text-2xl font-bold text-gray-50 tracking-tight">Upcycle AI</h1>
                 </div>
                 <button
                     onClick={onEditApiKey}
